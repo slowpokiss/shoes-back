@@ -32,7 +32,7 @@
       res.json(result.rows);
     } catch (err) {
       console.error(err);
-      res.status(500).send('No such data in database', err);
+      res.status(500).send('No categories data in database', err);
     }
   });
 
@@ -42,7 +42,7 @@
       res.json(result.rows);
     } catch (err) {
       console.error(err);
-      res.status(500).send('No such data in database', err);
+      res.status(500).send('No top-sales data in database', err);
     }
   })
 
@@ -67,7 +67,7 @@
       res.json(rows);
     } catch (err) {
       console.error(err);
-      res.status(500).send('No such data in database');
+      res.status(500).send('No products data in database');
     }
   });
 
@@ -80,7 +80,7 @@
       res.json(result.rows);
     } catch (err) {
       console.error(err);
-      res.status(500).send('No such data in database', err);
+      res.status(500).send('No current product data in database', err);
     }
   });
 
