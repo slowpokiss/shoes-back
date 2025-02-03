@@ -32,7 +32,7 @@ app.get("/api/categories", async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).send({ description: "No categories data in database", error: err });
+    res.status(500).json({ description: "No categories data in database", error: err });
   }
 });
 
@@ -46,7 +46,7 @@ app.get("/api/top-sales", async (req, res) => {
     console.error(err);
     res
       .status(500)
-      .send({ description: "No top-sales data in database", error: err });
+      .json({ description: "No top-sales data in database", error: err });
   }
 });
 
@@ -73,7 +73,7 @@ app.get("/api/products", async (req, res) => {
     res.json(rows);
   } catch (err) {
     console.error(err);
-    res.status(500).send({description: "No products data in database", error: err});
+    res.status(500).json({description: "No products data in database", error: err});
   }
 });
 
@@ -87,7 +87,7 @@ app.get("/api/products/:id", async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).send({description: "No current product data in database", error: err});
+    res.status(500).json({description: "No current product data in database", error: err});
   }
 });
 
@@ -118,7 +118,7 @@ app.post("/api/order", async (req, res) => {
         count > 0
     )
   ) {
-    return res.status(400).send({ description: "bad request: invalid items", error: err });
+    return res.status(400).json({ description: "bad request: invalid items", error: err });
   }
 
   try {
@@ -142,10 +142,10 @@ app.post("/api/order", async (req, res) => {
       );
     }
 
-    return res.status(204).send();
+    return res.status(204).json();
   } catch (err) {
     console.error(err);
-    return res.status(500).send({ description: "Server Error", error: err });
+    return res.status(500).json({ description: "Server Error", error: err });
   }
 });
 
