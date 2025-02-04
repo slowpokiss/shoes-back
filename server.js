@@ -38,7 +38,6 @@ app.get("/api/categories", async (req, res) => {
 app.get("/api/top-sales", async (req, res) => {
   try {
     const values = topSaleIds.map(id => ` ${id}`).join(','); 
-    console.log(values)
     const query = `SELECT * FROM products WHERE id IN (${values})`; 
     const result = await client.query(query); 
     res.json(result.rows);
