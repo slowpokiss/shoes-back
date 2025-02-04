@@ -1,12 +1,14 @@
 const { Client } = require("pg");
 const fs = require("fs");
+require("dotenv").config();
 
 const client = new Client({
-  user: "postgres",
-  host: "localhost",
-  database: "shoes_db",
-  password: "mihaadmin",
-  port: 5432,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: { rejectUnauthorized: false },
 });
 
 async function importData() {
@@ -22,6 +24,12 @@ async function importData() {
   }
 
   for (const product of products) {
+    const productImages = product.images ? product.images : [];
+    await client.query(
+      "UPDATE products SET images = $1 WHERE id = $2",
+      [productImages, product.id]
+    );
+
     await client.query(
       "INSERT INTO products (id, category_id, title, sku, manufacturer, color, material, reason, season, heel_size, price, old_price) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
       [
@@ -39,7 +47,7 @@ async function importData() {
         product.oldPrice || null,
       ]
     );
-
+    
     for (const size of product.sizes) {
       await client.query(
         "INSERT INTO product_sizes (product_id, size, available) VALUES ($1, $2, $3)",
@@ -47,7 +55,7 @@ async function importData() {
       );
     }
   }
-
+  
   await client.end();
 }
 

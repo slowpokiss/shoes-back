@@ -10,7 +10,6 @@ app.use(cors());
 // hardСode
 const moreCount = 6;
 const topSaleIds = [66, 65, 73];
-const topSaleMapped = topSaleIds.map((_, index) => `$${index + 1}`).join(", ");
 
 const client = new Client({
   host: process.env.DB_HOST,
@@ -38,9 +37,10 @@ app.get("/api/categories", async (req, res) => {
 
 app.get("/api/top-sales", async (req, res) => {
   try {
-    const result = await client.query(`SELECT * FROM products WHERE id IN $1`, [
-      topSaleMapped,
-    ]);
+    const values = topSaleIds.map(id => ` ${id}`).join(','); 
+    console.log(values)
+    const query = `SELECT * FROM products WHERE id IN (${values})`; 
+    const result = await client.query(query); 
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -88,7 +88,7 @@ app.get("/api/products/:id", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({description: "No current product data in database", error: err});
-  }
+  } 
 });
 
 app.post("/api/order", async (req, res) => {
@@ -105,7 +105,7 @@ app.post("/api/order", async (req, res) => {
   }
   if (!Array.isArray(items)) {
     return res.status(400).json({ message: "bad request: items" });
-  }
+  } 
 
   if (
     !items.every(
