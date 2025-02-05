@@ -86,22 +86,19 @@ app.get("/api/products/:id", async (req, res) => {
   try {
     const result = await client.query(
       `SELECT 
-  products.*,
-  JSON_AGG(
-    JSON_BUILD_OBJECT(
-      'size', product_sizes.size,
-      'available', product_sizes.available
-    )
-  ) AS sizes
-FROM products
-LEFT JOIN product_sizes ON products.id = product_sizes.product_id
-WHERE products.id = $1
-GROUP BY products.id;
-`,
-      [id]
-    );
+        products.*,
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'size', product_sizes.size,
+            'available', product_sizes.available
+          )
+        ) AS sizes
+      FROM products
+      LEFT JOIN product_sizes ON products.id = product_sizes.product_id
+      WHERE products.id = $1
+      GROUP BY products.id;`,[id] );
 
-    res.json(result.rows);
+    res.json(...result.rows);
   } catch (err) {
     console.error(err);
     res
