@@ -31,15 +31,17 @@ app.get("/api/categories", async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ description: "No categories data in database", error: err });
+    res
+      .status(500)
+      .json({ description: "No categories data in database", error: err });
   }
 });
 
 app.get("/api/top-sales", async (req, res) => {
   try {
-    const values = topSaleIds.map(id => ` ${id}`).join(','); 
-    const query = `SELECT * FROM products WHERE id IN (${values})`; 
-    const result = await client.query(query); 
+    const values = topSaleIds.map((id) => ` ${id}`).join(",");
+    const query = `SELECT * FROM products WHERE id IN (${values})`;
+    const result = await client.query(query);
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -72,7 +74,9 @@ app.get("/api/products", async (req, res) => {
     res.json(rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({description: "No products data in database", error: err});
+    res
+      .status(500)
+      .json({ description: "No products data in database", error: err });
   }
 });
 
@@ -81,13 +85,29 @@ app.get("/api/products/:id", async (req, res) => {
 
   try {
     const result = await client.query(
-      `SELECT * FROM public.products WHERE id = $1`, [id]
+      `SELECT 
+  products.*,
+  JSON_AGG(
+    JSON_BUILD_OBJECT(
+      'size', product_sizes.size,
+      'available', product_sizes.available
+    )
+  ) AS sizes
+FROM products
+LEFT JOIN product_sizes ON products.id = product_sizes.product_id
+WHERE products.id = $1
+GROUP BY products.id;
+`,
+      [id]
     );
+
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({description: "No current product data in database", error: err});
-  } 
+    res
+      .status(500)
+      .json({ description: "No current product data in database", error: err });
+  }
 });
 
 app.post("/api/order", async (req, res) => {
@@ -104,7 +124,7 @@ app.post("/api/order", async (req, res) => {
   }
   if (!Array.isArray(items)) {
     return res.status(400).json({ message: "bad request: items" });
-  } 
+  }
 
   if (
     !items.every(
@@ -117,7 +137,9 @@ app.post("/api/order", async (req, res) => {
         count > 0
     )
   ) {
-    return res.status(400).json({ description: "bad request: invalid items", error: err });
+    return res
+      .status(400)
+      .json({ description: "bad request: invalid items", error: err });
   }
 
   try {
