@@ -5,7 +5,8 @@ require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-app.use(cors());
+app.use(cors({ origin: "*" }));
+app.use(express.json());  
 
 // hardСode
 const moreCount = 6;
@@ -108,19 +109,14 @@ app.get("/api/products/:id", async (req, res) => {
 });
 
 app.post("/api/order", async (req, res) => {
+  console.log(req.body)
   const {
     owner: { phone, address },
     items,
   } = req.body;
 
-  if (typeof phone !== "string") {
-    return res.status(400).json({ message: "bad request: phone" });
-  }
-  if (typeof address !== "string") {
-    return res.status(400).json({ message: "bad request: address" });
-  }
-  if (!Array.isArray(items)) {
-    return res.status(400).json({ message: "bad request: items" });
+  if (typeof phone !== "string" || typeof address !== "string" || !Array.isArray(items)) {
+    return res.status(400).json({ message: "bad request: invalid items" });
   }
 
   if (
@@ -128,15 +124,14 @@ app.post("/api/order", async (req, res) => {
       ({ id, price, count }) =>
         typeof id === "number" &&
         id > 0 &&
-        typeof price === "number" &&
-        price > 0 &&
+        !isNaN(Number(price)) && price.trim() !== "" &&
         typeof count === "number" &&
         count > 0
     )
   ) {
     return res
       .status(400)
-      .json({ description: "bad request: invalid items", error: err });
+      .json({ description: "bad request: invalid items" });
   }
 
   try {
@@ -153,7 +148,7 @@ app.post("/api/order", async (req, res) => {
     const orderId = orderResult.rows[0].id;
 
     for (const { id, price, count } of items) {
-      const totalPrice = price * count;
+      const totalPrice = Number(price) * Number(count);
       await client.query(
         "INSERT INTO order_items (order_id, product_id, price, count, total_price) VALUES ($1, $2, $3, $4, $5)",
         [orderId, id, price, count, totalPrice]
