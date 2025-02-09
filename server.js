@@ -118,7 +118,6 @@ app.get("/api/products/:id", async (req, res) => {
 });
 
 app.post("/api/order", async (req, res) => {
-  console.log(req.body)
   const {
     owner: { phone, address },
     items,
