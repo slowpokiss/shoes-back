@@ -9,6 +9,13 @@ const port = process.env.PORT || 3000;
 app.use(cors({ origin: "*" }));
 app.use(express.json());  
 app.use(express.static(path.join(__dirname, "dist")));
+app.use("/assets", express.static(path.join(__dirname, "dist/assets"), { 
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith(".css")) {
+      res.setHeader("Content-Type", "text/css");
+    }
+  },
+}));
 
 // hardСode
 const moreCount = 6;
